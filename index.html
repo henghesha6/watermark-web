@@ -3,7 +3,7 @@
 <head>
     <meta charset="UTF-8">
     <meta name="viewport" content="width=device-width, initial-scale=1.0">
-    <title>精准无痕工业图片去水印工具</title>
+    <title>工业图片智能去水印网页端</title>
     <script src="https://cdn.tailwindcss.com"></script>
     <script src="https://cdnjs.cloudflare.com/ajax/libs/jszip/3.10.1/jszip.min.js"></script>
     <script src="https://cdnjs.cloudflare.com/ajax/libs/FileSaver.js/2.0.5/FileSaver.min.js"></script>
@@ -11,8 +11,8 @@
 <body class="bg-slate-900 min-h-screen text-slate-100 flex flex-col justify-between">
     <div class="max-w-4xl mx-auto px-4 py-8 w-full">
         <header class="text-center mb-8">
-            <h1 class="text-2xl font-bold text-white mb-2">🛠️ 工业配件精细化无痕去水印</h1>
-            <p class="text-sm text-slate-400">已避开顶部大标题，采用角落微区域精确融合，杜绝误伤与边缘撕裂</p>
+            <h1 class="text-2xl font-bold text-white mb-2">🛠️ 工业配件精细化去水印工具</h1>
+            <p class="text-sm text-slate-400">手机与电脑随时可用，完美避开顶部大标题，无痕去除角落水印</p>
         </header>
 
         <!-- 上传区域 -->
@@ -20,7 +20,7 @@
             <label for="fileInput" class="cursor-pointer flex flex-col items-center justify-center border-2 border-dashed border-slate-600 rounded-xl p-8 hover:border-blue-500 transition-colors bg-slate-800/50">
                 <svg class="w-12 h-12 text-slate-400 mb-3" fill="none" stroke="currentColor" viewBox="0 0 24 24"><path stroke-linecap="round" stroke-linejoin="round" stroke-width="2" d="M4 16l4.586-4.586a2 2 0 012.828 0L16 16m-2-2l1.586-1.586a2 2 0 012.828 0L20 14m-6-6h.01M6 20h12a2 2 0 002-2V6a2 2 0 00-2-2H6a2 2 0 00-2 2v12a2 2 0 002 2z"></path></svg>
                 <span class="text-sm font-medium text-slate-200">点击选择图片或拍照上传</span>
-                <span class="text-xs text-slate-400 mt-1">支持多图批量处理</span>
+                <span class="text-xs text-slate-400 mt-1">支持多图批量处理，完全在本地保护隐私</span>
             </label>
             <input type="file" id="fileInput" accept="image/*" multiple class="hidden">
         </div>
@@ -29,7 +29,7 @@
         <div id="actionPanel" class="hidden flex flex-col sm:flex-row items-center justify-between gap-4 mb-8 bg-slate-800 p-4 rounded-xl shadow-lg border border-slate-700">
             <span id="fileCount" class="text-sm font-medium text-slate-300">已选择 0 张图片</span>
             <div class="flex items-center gap-3 w-full sm:w-auto">
-                <button id="processBtn" class="flex-1 sm:flex-none bg-blue-600 hover:bg-blue-500 text-white font-medium px-6 py-2.5 rounded-lg shadow transition-all text-sm">开始精细去水印</button>
+                <button id="processBtn" class="flex-1 sm:flex-none bg-blue-600 hover:bg-blue-500 text-white font-medium px-6 py-2.5 rounded-lg shadow transition-all text-sm">开始去水印</button>
                 <button id="downloadAllBtn" class="hidden flex-1 sm:flex-none bg-emerald-600 hover:bg-emerald-500 text-white font-medium px-6 py-2.5 rounded-lg shadow transition-all text-sm">打包下载全部</button>
             </div>
         </div>
@@ -39,7 +39,7 @@
     </div>
 
     <footer class="text-center py-6 text-xs text-slate-500 border-t border-slate-800 bg-slate-900 mt-12">
-        Powered by GitHub Pages & Smart Corner Protection
+        Powered by GitHub Pages & HTML5 Smart Canvas
     </footer>
 
     <script>
@@ -97,7 +97,7 @@
                 statusSpan.className = 'text-blue-400 font-medium';
 
                 try {
-                    const processedDataUrl = await preciseRemoveWatermark(file);
+                    const processedDataUrl = await smartRemoveWatermark(file);
                     processedResults.push({ name: file.name, dataUrl: processedDataUrl });
 
                     const imgEl = document.getElementById(`img-${i}`);
@@ -118,8 +118,8 @@
             }
         });
 
-        // 精细化去水印算法：严格限制在绝对角落（避开上方大标题），采用微距纹理平滑填充
-        function preciseRemoveWatermark(file) {
+        // 核心精细去水印：严格保护大标题，精准微区域边缘纹理采样填充
+        function smartRemoveWatermark(file) {
             return new Promise((resolve, reject) => {
                 const reader = new FileReader();
                 reader.onload = (e) => {
@@ -134,15 +134,15 @@
                         const w = canvas.width;
                         const h = canvas.height;
 
-                        // 1. 极小化左上角水印区域（仅占极边缘，绝对不触碰中间的 SOLIDBASEPART 标题文字）
+                        // 1. 左上角：精确微型限制，完全避开 SOLIDBASEPART 标题
                         const tlW = Math.floor(w * 0.08);
                         const tlH = Math.floor(h * 0.04);
-                        cleanSpecificCorner(ctx, 0, 0, tlW, tlH, w, h, 'top-left');
+                        cleanCorner(ctx, 0, 0, tlW, tlH, w, h, 'top-left');
 
-                        // 2. 极小化右下角水印区域（仅清理角落小标志）
+                        // 2. 右下角：精确清理角落标志
                         const brW = Math.floor(w * 0.12);
                         const brH = Math.floor(h * 0.06);
-                        cleanSpecificCorner(ctx, w - brW, h - brH, brW, brH, w, h, 'bottom-right');
+                        cleanCorner(ctx, w - brW, h - brH, brW, brH, w, h, 'bottom-right');
 
                         resolve(canvas.toDataURL('image/jpeg', 0.98));
                     };
@@ -154,36 +154,42 @@
             });
         }
 
-        function cleanSpecificCorner(ctx, x, y, bw, bh, imgW, imgH, type) {
+        function cleanCorner(ctx, x, y, bw, bh, imgW, imgH, type) {
             try {
-                // 根据不同角落安全采样内部干净背景
                 let sampleX = (type === 'top-left') ? (x + bw + 2) : (x - 10);
                 let sampleY = (type === 'top-left') ? (y + bh + 2) : (y - 10);
 
-                // 确保采样点在合理范围内
                 if (sampleX < 0) sampleX = 5;
                 if (sampleY < 0) sampleY = 5;
                 if (sampleX + bw >= imgW) sampleX = imgW - bw - 5;
                 if (sampleY + bh >= imgH) sampleY = imgH - bh - 5;
 
                 const patch = ctx.getImageData(sampleX, sampleY, bw, bh);
-                
-                // 将安全采样直接覆盖到角落水印处
                 ctx.putImageData(patch, x, y);
 
-                // 轻度高斯模糊边缘过渡，消除拼接边缘
+                // 模糊过度，消除粗糙边界
                 ctx.save();
                 ctx.filter = 'blur(3px)';
                 ctx.globalAlpha = 0.5;
                 ctx.drawImage(ctx.canvas, x, y, bw, bh, x, y, bw, bh);
                 ctx.restore();
-
             } catch (err) {
-                // 兜底策略
                 ctx.fillStyle = '#ffffff';
                 ctx.fillRect(x, y, bw, bh);
             }
         }
+
+        downloadAllBtn.addEventListener('click', () => {
+            const zip = new JSZip();
+            processedResults.forEach((item, index) => {
+                const base64Data = item.dataUrl.replace(/^data:image\/jpeg;base64,/, "");
+                zip.file(`clean_${index + 1}_${item.name}`, base64Data, { base64: true });
+            });
+
+            zip.generateAsync({ type: "blob" }).then((content) => {
+                saveAs(content, "watermark_removed_images.zip");
+            });
+        });
     </script>
 </body>
 </html>
